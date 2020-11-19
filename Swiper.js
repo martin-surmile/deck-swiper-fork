@@ -464,8 +464,8 @@ class Swiper extends Component {
   }
 
   animateStack = () => {
-    const { cards, secondCardIndex, swipedAllCards } = this.state
-    let { stackSize, infinite, showSecondCard } = this.props
+    const { secondCardIndex, swipedAllCards } = this.state
+    let { cards, stackSize, infinite, showSecondCard } = this.props
     let index = secondCardIndex
 
     while (stackSize-- > 1 && showSecondCard && !swipedAllCards) {
@@ -488,6 +488,8 @@ class Swiper extends Component {
         ]).start()
       }
 
+      console.log('ARRAY LENGTH: ', cards.length);
+
       if (index === cards.length - 1) {
         if (!infinite) break
         index = 0
@@ -505,7 +507,7 @@ class Swiper extends Component {
 
     this.onSwipedCallbacks(onSwiped)
 
-    const allSwipedCheck = () => newCardIndex === this.state.cards.length
+    const allSwipedCheck = () => newCardIndex === this.props.cards.length
 
     if (allSwipedCheck()) {
       if (!infinite) {
@@ -524,7 +526,7 @@ class Swiper extends Component {
 
   decrementCardIndex = cb => {
     const { firstCardIndex } = this.state
-    const lastCardIndex = this.state.cards.length - 1
+    const lastCardIndex = this.props.cards.length - 1
     const previousCardIndex = firstCardIndex - 1
 
     const newCardIndex =
@@ -535,17 +537,17 @@ class Swiper extends Component {
   }
 
   jumpToCardIndex = newCardIndex => {
-    if (this.state.cards[newCardIndex]) {
+    if (this.props.cards[newCardIndex]) {
       this.setCardIndex(newCardIndex, false)
     }
   }
 
   onSwipedCallbacks = (swipeDirectionCallback) => {
     const previousCardIndex = this.state.firstCardIndex
-    this.props.onSwiped(previousCardIndex, this.state.cards[previousCardIndex])
+    this.props.onSwiped(previousCardIndex, this.props.cards[previousCardIndex])
 
     if (swipeDirectionCallback) {
-      swipeDirectionCallback(previousCardIndex, this.state.cards[previousCardIndex])
+      swipeDirectionCallback(previousCardIndex, this.props.cards[previousCardIndex])
     }
   }
 
@@ -553,7 +555,7 @@ class Swiper extends Component {
     if (this._mounted) {
       this.setState(
         {
-          ...calculateCardIndexes(newCardIndex, this.state.cards),
+          ...calculateCardIndexes(newCardIndex, this.props.cards),
           swipedAllCards: swipedAllCards,
           panResponderLocked: false
         },
@@ -761,9 +763,9 @@ class Swiper extends Component {
   }
 
   renderStack = () => {
-    const { cards, firstCardIndex, swipedAllCards } = this.state
+    const { firstCardIndex, swipedAllCards } = this.state
     const renderedCards = []
-    let { stackSize, infinite, showSecondCard } = this.props
+    let { cards, stackSize, infinite, showSecondCard } = this.props
     let index = firstCardIndex
     let firstCard = true
     let cardPosition = 0
