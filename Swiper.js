@@ -488,8 +488,6 @@ class Swiper extends Component {
         ]).start()
       }
 
-      console.log('ARRAY LENGTH: ', cards.length);
-
       if (index === cards.length - 1) {
         if (!infinite) break
         index = 0
@@ -540,6 +538,10 @@ class Swiper extends Component {
     if (this.props.cards[newCardIndex]) {
       this.setCardIndex(newCardIndex, false)
     }
+  }
+
+  getCurrentCardIndex = () => {
+    return this.state.firstCardIndex;
   }
 
   onSwipedCallbacks = (swipeDirectionCallback) => {
