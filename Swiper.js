@@ -80,7 +80,7 @@ class Swiper extends Component {
 
   componentDidUpdate(prevProps) {
     if (!isEqual(this.props.cards, prevProps.cards) && this.props.cards.length > 0) {
-      this.setCardIndex(0, false);
+      this.setCardIndex(this.state.firstCardIndex - 1, false);
     }
   }
 
