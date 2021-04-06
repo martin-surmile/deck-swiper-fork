@@ -328,10 +328,11 @@ class Swiper extends Component {
   }
 
   resetTopCard = cb => {
+    this.setState({ labelType: LABEL_TYPES.NONE });
     Animated.spring(this.state.pan, {
       toValue: 0,
       friction: this.props.topCardResetAnimationFriction,
-      tension: this.props.topCardResetAnimationTension,
+      tension: this.props.topCardResetAnimationTension*0.5,
       useNativeDriver: true
     }).start(cb)
 
@@ -343,11 +344,25 @@ class Swiper extends Component {
     this.props.onSwipedAborted()
   }
 
+  swipeTutorial = () => {
+    this.simulateSwipeRight();
+  }
+
   swipeLeft = () => {
     this.swipeCard(
       this.props.onSwipedLeft,
       -this.props.horizontalThreshold,
-      0
+      0,
+      2
+    )
+  }
+
+  simulateSwipeLeft = () => {
+    this.simulateSwipeCard(
+      -this.props.horizontalThreshold,
+      0,
+      2,
+      3
     )
   }
 
@@ -355,7 +370,17 @@ class Swiper extends Component {
     this.swipeCard(
       this.props.onSwipedRight,
       this.props.horizontalThreshold,
-      0
+      0,
+      1
+    )
+  }
+
+  simulateSwipeRight = () => {
+    this.simulateSwipeCard(
+      this.props.horizontalThreshold,
+      0,
+      1,
+      2
     )
   }
 
@@ -363,7 +388,17 @@ class Swiper extends Component {
     this.swipeCard(
       this.props.onSwipedTop,
       0,
-      -this.props.verticalThreshold
+      -this.props.verticalThreshold,
+      3
+    )
+  }
+
+  simulateSwipeTop = () => {
+    this.simulateSwipeCard(
+      0,
+      -this.props.verticalThreshold,
+      3,
+      4
     )
   }
 
@@ -379,7 +414,25 @@ class Swiper extends Component {
     onSwiped,
     x = this._animatedValueX,
     y = this._animatedValueY,
+    actual,
   ) => {
+    switch (actual) {
+      case 1:
+        this.setState({ labelType: LABEL_TYPES.RIGHT });
+        break;
+
+      case 2:
+        this.setState({ labelType: LABEL_TYPES.LEFT });
+        break;
+
+      case 3:
+        this.setState({ labelType: LABEL_TYPES.TOP });
+        break;
+
+      default:
+        this.setState({ labelType: LABEL_TYPES.NONE });
+        break;
+    }
     this.setState({ panResponderLocked: true })
     this.animateStack()
     Animated.timing(this.state.pan, {
@@ -390,7 +443,62 @@ class Swiper extends Component {
       duration: this.props.swipeAnimationDuration,
       useNativeDriver: true
     }).start(() => {
+      this.setState({ labelType: LABEL_TYPES.NONE });
       this.incrementCardIndex(onSwiped);
+    })
+  }
+
+  simulateSwipeCard= (
+    x = this._animatedValueX,
+    y = this._animatedValueY,
+    actual,
+    next,
+  ) => {
+    Animated.delay(350).start(()=>{
+      switch (actual) {
+        case 1:
+          this.setState({ labelType: LABEL_TYPES.RIGHT });
+          break;
+
+        case 2:
+          this.setState({ labelType: LABEL_TYPES.LEFT });
+          break;
+
+        case 3:
+          this.setState({ labelType: LABEL_TYPES.TOP });
+          break;
+
+        default:
+          this.setState({ labelType: LABEL_TYPES.NONE });
+          break;
+      }
+
+      Animated.timing(this.state.pan, {
+        toValue: {
+          x: x * 2.0,
+          y: y * 2.0
+        },
+        duration: this.props.swipeAnimationDuration*1.35,
+        useNativeDriver: true
+      }).start(() => {
+        this.resetTopCard();
+        switch (next) {
+          case 1:
+            this.simulateSwipeRight();
+            break;
+
+          case 2:
+            this.simulateSwipeLeft();
+            break;
+
+          case 3:
+            this.simulateSwipeTop();
+            break;
+
+          default:
+            break;
+        }
+      })
     })
   }
 
@@ -691,7 +799,6 @@ class Swiper extends Component {
       disableTopSwipe,
       overlayLabels
     } = this.props
-
     const { labelType } = this.state
 
     const labelTypeNone = labelType === LABEL_TYPES.NONE
